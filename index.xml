@@ -2,55 +2,55 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>kousikk</title>
-    <link>http://kousiktn.github.io/</link>
+    <link>https://kousiktn.github.io/</link>
     <description>Recent content on kousikk</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 20 Sep 2020 00:00:00 +0000</lastBuildDate><atom:link href="http://kousiktn.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 20 Sep 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://kousiktn.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Remote Build Execution</title>
-      <link>http://kousiktn.github.io/posts/2020-09-20-remote-build-execution/</link>
+      <link>https://kousiktn.github.io/posts/2020-09-20-remote-build-execution/</link>
       <pubDate>Sun, 20 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>http://kousiktn.github.io/posts/2020-09-20-remote-build-execution/</guid>
+      <guid>https://kousiktn.github.io/posts/2020-09-20-remote-build-execution/</guid>
       <description>Remote Build Execution - An Overview One of the big benefits of using build systems like Bazel is that it supports remote-execution and caching of the build out of the box. Each action in the build graph can be executed on a remote machine, cached and then downloaded onto the local machine. When there are multiple developers on the team (or you are re-building your project from scratch on a different machine), and if the build has already been run by a developer in the team, then the other developers can simply reuse the results of the previous build thereby reducing the build time and load on the their local machines.</description>
     </item>
     
     <item>
       <title>Harry Potter and The Half-Blood Prince</title>
-      <link>http://kousiktn.github.io/posts/2015-11-27-harry-potter-half-blood-prince/</link>
+      <link>https://kousiktn.github.io/posts/2015-11-27-harry-potter-half-blood-prince/</link>
       <pubDate>Fri, 27 Nov 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://kousiktn.github.io/posts/2015-11-27-harry-potter-half-blood-prince/</guid>
+      <guid>https://kousiktn.github.io/posts/2015-11-27-harry-potter-half-blood-prince/</guid>
       <description>Warning: Harry Potter(book) fanboy rant ahead
 So I was watching Harry Potter and The Half-Blood Prince movie on HBO while having my dinner. It was the climax scene where Harry and Dumbledore venture out to destroy one of Voldemort&amp;rsquo;s horcruxes. I knew exactly what was going to happen, having read the books many times over(obviously). I also know that the movie was going to disappoint me in a profound way, having dramatized a crucial part differently, the part which I am going to be talking about.</description>
     </item>
     
     <item>
       <title>[IF]</title>
-      <link>http://kousiktn.github.io/posts/2015-08-07-if/</link>
+      <link>https://kousiktn.github.io/posts/2015-08-07-if/</link>
       <pubDate>Fri, 07 Aug 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://kousiktn.github.io/posts/2015-08-07-if/</guid>
+      <guid>https://kousiktn.github.io/posts/2015-08-07-if/</guid>
       <description>If you can keep your head when all about you Are losing theirs and blaming it on you, If you can trust yourself when all men doubt you, But make allowance for their doubting too; If you can wait and not be tired by waiting, Or being lied about, don&amp;rsquo;t deal in lies, Or being hated, don&amp;rsquo;t give way to hating, And yet don&amp;rsquo;t look too good, nor talk too wise:</description>
     </item>
     
     <item>
       <title>Hello World</title>
-      <link>http://kousiktn.github.io/posts/2015-07-20-hello-world/</link>
+      <link>https://kousiktn.github.io/posts/2015-07-20-hello-world/</link>
       <pubDate>Mon, 20 Jul 2015 00:00:00 +0000</pubDate>
       
-      <guid>http://kousiktn.github.io/posts/2015-07-20-hello-world/</guid>
+      <guid>https://kousiktn.github.io/posts/2015-07-20-hello-world/</guid>
       <description>Hello World!
 As usual, this is the customary Hello World post that I usually do when I set up a new blog. I promise to myself that I will maintain this blog for quite some time before I let it become a Voyager spacecraft.</description>
     </item>
     
     <item>
       <title>About Me</title>
-      <link>http://kousiktn.github.io/about/</link>
+      <link>https://kousiktn.github.io/about/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>http://kousiktn.github.io/about/</guid>
+      <guid>https://kousiktn.github.io/about/</guid>
       <description>Hi there! I&amp;rsquo;m a Software Engineer working on distributed builds at Google.
 You can reach me at kousiktn[at]gmail.com.</description>
     </item>
