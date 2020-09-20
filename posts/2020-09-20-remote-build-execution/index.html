@@ -232,7 +232,7 @@ platform: {
 <li>Serialize the action spec to binary format and compute the digest of the serialized action spec.</li>
 <li>Upload the action spec to CAS keyed by its digest.</li>
 <li>Call <a href="https://github.com/bazelbuild/remote-apis/blob/master/build/bazel/remote/execution/v2/remote_execution.proto#L107">Execute()</a> RPC on the remote-execution server.</li>
-<li>Download the output file digest present in the result of the <code>Execute()</code> call.</li>
+<li>Download the output file from the CAS using the digest present in the result of the <code>Execute()</code> call.</li>
 </ol>
 
       </div>
