@@ -1,147 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Language" content="en">
-
-    <meta name="author" content="Kousik Kumar">
-    <meta name="description" content="Remote Build Execution - An Overview One of the big benefits of using build systems like Bazel is that it supports remote-execution and caching of the build out of the box. Each action in the build graph can be executed on a remote machine, cached and then downloaded onto the local machine. When there are multiple developers on the team (or you are re-building your project from scratch on a different machine), and if the build has already been run by a developer in the team, then the other developers can simply reuse the results of the previous build thereby reducing the build time and load on the their local machines.">
-    <meta name="keywords" content="blog,developer,personal">
-
-    
-
-    <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Remote Build Execution"/>
-<meta name="twitter:description" content="Remote Build Execution - An Overview One of the big benefits of using build systems like Bazel is that it supports remote-execution and caching of the build out of the box. Each action in the build graph can be executed on a remote machine, cached and then downloaded onto the local machine. When there are multiple developers on the team (or you are re-building your project from scratch on a different machine), and if the build has already been run by a developer in the team, then the other developers can simply reuse the results of the previous build thereby reducing the build time and load on the their local machines."/>
-
-    <meta property="og:title" content="Remote Build Execution" />
-<meta property="og:description" content="Remote Build Execution - An Overview One of the big benefits of using build systems like Bazel is that it supports remote-execution and caching of the build out of the box. Each action in the build graph can be executed on a remote machine, cached and then downloaded onto the local machine. When there are multiple developers on the team (or you are re-building your project from scratch on a different machine), and if the build has already been run by a developer in the team, then the other developers can simply reuse the results of the previous build thereby reducing the build time and load on the their local machines." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://kousiktn.github.io/posts/2020-09-20-remote-build-execution/" />
-<meta property="article:published_time" content="2020-09-20T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-09-20T00:00:00+00:00" />
-
-
-    
-      <base href="https://kousiktn.github.io/posts/2020-09-20-remote-build-execution/">
-    
-    <title>
+<head>
+  <title>
   Remote Build Execution · kousikk
 </title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
 
-    
-      <link rel="canonical" href="https://kousiktn.github.io/posts/2020-09-20-remote-build-execution/">
-    
 
-    <link href="https://fonts.googleapis.com/css?family=Lato:400,700%7CMerriweather:300,700%7CSource+Code+Pro:400,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css" integrity="sha384-Bfad6CLCknfcloXFOyFnlgtENryhrpZCe29RTifKEixXQZ38WheV+i/6YWSzkz3V" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin="anonymous" />
 
-    
-      
-      
-      <link rel="stylesheet" href="https://kousiktn.github.io/css/coder.min.fce3d3684e836ce340cdd591dad1749c310472d5ed4049fab99845c9aec4d4bf.css" integrity="sha256-/OPTaE6DbONAzdWR2tF0nDEEctXtQEn6uZhFya7E1L8=" crossorigin="anonymous" media="screen" />
-    
 
-    
-
-    
-      
-        
-        
-        <link rel="stylesheet" href="https://kousiktn.github.io/css/coder-dark.min.717236c74e0a5208ef73964a9f44c6b443b689a95b270d8b2a40d0c012460dac.css" integrity="sha256-cXI2x04KUgjvc5ZKn0TGtEO2ialbJw2LKkDQwBJGDaw=" crossorigin="anonymous" media="screen" />
-      
-    
-
-    
-
-    
-
-    <link rel="icon" type="image/png" href="https://kousiktn.github.io/images/favicon-32x32.png" sizes="32x32">
-    <link rel="icon" type="image/png" href="https://kousiktn.github.io/images/favicon-16x16.png" sizes="16x16">
-
-    <link rel="apple-touch-icon" href="https://kousiktn.github.io/images/apple-touch-icon.png">
-    <link rel="apple-touch-icon"  sizes="180x180" href="https://kousiktn.github.io/images/apple-touch-icon.png">
-
-    <meta name="generator" content="Hugo 0.75.1" />
-  </head>
-  
-  
+<meta name="author" content="Kousik Kumar">
+<meta name="description" content="
+  Remote Build Execution - An Overview
   
     
+    Link to heading
   
-  <body class="colorscheme-auto"
-        onload=""
-  >
-    <main class="wrapper">
-      <nav class="navigation">
+
+One of the big benefits of using build systems like Bazel is that it supports remote-execution and caching of the build out of the box. Each action in the build graph can be executed on a remote machine, cached and then downloaded onto the local machine. When there are multiple developers on the team (or you are re-building your project from scratch on a different machine), and if the build has already been run by a developer in the team, then the other developers can simply reuse the results of the previous build thereby reducing the build time and load on the their local machines.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Remote Build Execution">
+  <meta name="twitter:description" content="Remote Build Execution - An Overview Link to heading One of the big benefits of using build systems like Bazel is that it supports remote-execution and caching of the build out of the box. Each action in the build graph can be executed on a remote machine, cached and then downloaded onto the local machine. When there are multiple developers on the team (or you are re-building your project from scratch on a different machine), and if the build has already been run by a developer in the team, then the other developers can simply reuse the results of the previous build thereby reducing the build time and load on the their local machines.">
+
+<meta property="og:url" content="https://kousiktn.github.io/posts/2020-09-20-remote-build-execution/">
+  <meta property="og:site_name" content="kousikk">
+  <meta property="og:title" content="Remote Build Execution">
+  <meta property="og:description" content="Remote Build Execution - An Overview Link to heading One of the big benefits of using build systems like Bazel is that it supports remote-execution and caching of the build out of the box. Each action in the build graph can be executed on a remote machine, cached and then downloaded onto the local machine. When there are multiple developers on the team (or you are re-building your project from scratch on a different machine), and if the build has already been run by a developer in the team, then the other developers can simply reuse the results of the previous build thereby reducing the build time and load on the their local machines.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2020-09-20T00:00:00+00:00">
+    <meta property="article:modified_time" content="2020-09-20T00:00:00+00:00">
+
+
+
+
+<link rel="canonical" href="https://kousiktn.github.io/posts/2020-09-20-remote-build-execution/">
+
+
+<link rel="preload" href="https://kousiktn.github.io/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://kousiktn.github.io/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://kousiktn.github.io/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="https://kousiktn.github.io/css/coder.min.320f775dc23c4eaba9df40ebced622292869c0437f4d5d744c43e5fe34882f03.css" integrity="sha256-Mg93XcI8Tqup30DrztYiKShpwEN/TV10TEPl/jSILwM=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="https://kousiktn.github.io/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="https://kousiktn.github.io/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="https://kousiktn.github.io/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="https://kousiktn.github.io/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="https://kousiktn.github.io/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://kousiktn.github.io/images/apple-touch-icon.png">
+
+<link rel="manifest" href="https://kousiktn.github.io/site.webmanifest">
+<link rel="mask-icon" href="https://kousiktn.github.io/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+
+
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
   <section class="container">
+    
     <a class="navigation-title" href="https://kousiktn.github.io/">
       kousikk
     </a>
     
-      <span id="dark-mode-toggle" class="float-right">
-        <i class="fas fa-adjust fa-fw"></i>
-      </span>
+    
       <input type="checkbox" id="menu-toggle" />
       <label class="menu-button float-right" for="menu-toggle">
-        <i class="fas fa-bars fa-fw"></i>
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
       </label>
       <ul class="navigation-list">
         
           
             <li class="navigation-item">
-              <a class="navigation-link" href="https://kousiktn.github.io/posts/">Blog</a>
+              <a class="navigation-link " href="https://kousiktn.github.io/posts/">Blog</a>
             </li>
           
             <li class="navigation-item">
-              <a class="navigation-link" href="https://kousiktn.github.io/about/">About</a>
+              <a class="navigation-link " href="https://kousiktn.github.io/about/">About</a>
             </li>
           
         
         
-        <li class="navigation-item separator">
-          <span>|</span>
-        </li>
       </ul>
     
   </section>
 </nav>
 
 
-      <div class="content">
-        
+    <div class="content">
+      
   <section class="container post">
     <article>
       <header>
         <div class="post-title">
-          <h1 class="title">Remote Build Execution</h1>
+          <h1 class="title">
+            <a class="title-link" href="https://kousiktn.github.io/posts/2020-09-20-remote-build-execution/">
+              Remote Build Execution
+            </a>
+          </h1>
         </div>
         <div class="post-meta">
           <div class="date">
             <span class="posted-on">
-              <i class="fas fa-calendar"></i>
-              <time datetime='2020-09-20T00:00:00Z'>
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2020-09-20T00:00:00Z">
                 September 20, 2020
               </time>
             </span>
             <span class="reading-time">
-              <i class="fas fa-clock"></i>
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
               5-minute read
             </span>
           </div>
           
           
+          
         </div>
       </header>
 
-      <div>
+      <div class="post-content">
         
-        <h1 id="remote-build-execution---an-overview">Remote Build Execution - An Overview</h1>
+        <h1 id="remote-build-execution---an-overview">
+  Remote Build Execution - An Overview
+  <a class="heading-link" href="#remote-build-execution---an-overview">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h1>
 <p>One of the big benefits of using build systems like Bazel is that it supports remote-execution and caching of the build out of the box. Each action in the build graph can be executed on a remote machine, cached and then downloaded onto the local machine. When there are multiple developers on the team (or you are re-building your project from scratch on a different machine), and if the build has already been run by a developer in the team, then the other developers can simply reuse the results of the previous build thereby reducing the build time and load on the their local machines.</p>
-<h2 id="how-is-a-remotely-executed-build-faster">How is a remotely executed build faster?</h2>
+<h2 id="how-is-a-remotely-executed-build-faster">
+  How is a remotely executed build faster?
+  <a class="heading-link" href="#how-is-a-remotely-executed-build-faster">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
 <p>Faster end-to-end build time is achieved in two ways:</p>
 <ol>
 <li><em><strong>High Parallelism</strong></em></li>
@@ -150,10 +194,22 @@
 <ol start="2">
 <li><em><strong>Cached Action Results</strong></em></li>
 </ol>
-<p>While remote-execution of an individual action is generally expected to be slower than a locally executed action (remote-execution has overhead like shipping local input files to remote server, running the action on remote-server and downloading remotely executed results), fetching the cached result of a previously remotely executed action is usually faster than locally executing a build action. In a large organization (like Google :D) or a large repository, <a href="http://google-engtools.blogspot.com/2011/09/build-in-cloud-distributing-build-steps.html"><code>&gt; 90%</code></a> of the overall actions generally result in cache-hits. The larger the number of repetitive builds you do, the higher your cache-hit rate will be.</p>
-<h2 id="remote-execution-api">Remote Execution API</h2>
-<h3 id="action-specification">Action Specification</h3>
-<p>Build systems like Bazel use the open source <a href="https://github.com/bazelbuild/remote-apis">Remote Execution API</a> with a corresponding gRPC server that implements a remote-execution API. The remote-execution API describes a mechanism for executing an arbitrary local command remotely. In order to execute a command on a remote machine you would need the following basic things:</p>
+<p>While remote-execution of an individual action is generally expected to be slower than a locally executed action (remote-execution has overhead like shipping local input files to remote server, running the action on remote-server and downloading remotely executed results), fetching the cached result of a previously remotely executed action is usually faster than locally executing a build action. In a large organization (like Google :D) or a large repository, <a href="http://google-engtools.blogspot.com/2011/09/build-in-cloud-distributing-build-steps.html"  class="external-link" target="_blank" rel="noopener"><code>&gt; 90%</code></a> of the overall actions generally result in cache-hits. The larger the number of repetitive builds you do, the higher your cache-hit rate will be.</p>
+<h2 id="remote-execution-api">
+  Remote Execution API
+  <a class="heading-link" href="#remote-execution-api">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<h3 id="action-specification">
+  Action Specification
+  <a class="heading-link" href="#action-specification">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<p>Build systems like Bazel use the open source <a href="https://github.com/bazelbuild/remote-apis"  class="external-link" target="_blank" rel="noopener">Remote Execution API</a> with a corresponding gRPC server that implements a remote-execution API. The remote-execution API describes a mechanism for executing an arbitrary local command remotely. In order to execute a command on a remote machine you would need the following basic things:</p>
 <ol>
 <li>The command line invocation</li>
 <li>Input files / directories</li>
@@ -162,24 +218,30 @@
 <li>Platform configuration (like Mac / Linux / Windows)</li>
 </ol>
 <p>For example, lets say you want to run a compilation action like the following on a remote Linux machine</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">PWD=/proc/self/cwd clang++ -c test.cpp -o test.o
-</code></pre></div><p>Here&rsquo;s what the various requirements mentioned above would map to:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>PWD=/proc/self/cwd clang++ -c test.cpp -o test.o
+</span></span></code></pre></div><p>Here&rsquo;s what the various requirements mentioned above would map to:</p>
 <ol>
 <li>The command line invocation = <code>clang++ -c test.cpp -o test.o</code>.</li>
 <li>Input files / directories
 This would include the following files:</li>
 </ol>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">1. test.cpp
-2. test.h
-3. ... other header files included by test.h / test.cpp transitively ...
-</code></pre></div><ol start="3">
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>1. test.cpp
+</span></span><span style="display:flex;"><span>2. test.h
+</span></span><span style="display:flex;"><span>3. ... other header files included by test.h / test.cpp transitively ...
+</span></span></code></pre></div><ol start="3">
 <li>Environment variables = <code>PWD=/proc/self/cwd</code></li>
 <li>Output files / directories = <code>test.o</code></li>
 <li>Platform configuration = <code>OS=Linux, toolchain=clang-10</code>
 Note that the platform configuration you specify depends on what platform configurations the remote-execution server respects. In the example above, the remote-execution server would have to know to make <code>clang-10</code> binaries available during command execution and must execute the command on a Linux machine. As you can imagine, more fancier platform specifications are possible.</li>
 </ol>
-<p>An encapsulation of the various things described above is what we call an <a href="https://github.com/bazelbuild/remote-apis/blob/master/build/bazel/remote/execution/v2/remote_execution.proto#L388"><code>Action</code></a>. An <code>Action</code> captures the various information needed to run the command on a remote server.</p>
-<h3 id="content-addressable-storage">Content Addressable Storage</h3>
+<p>An encapsulation of the various things described above is what we call an <a href="https://github.com/bazelbuild/remote-apis/blob/master/build/bazel/remote/execution/v2/remote_execution.proto#L388"  class="external-link" target="_blank" rel="noopener"><code>Action</code></a>. An <code>Action</code> captures the various information needed to run the command on a remote server.</p>
+<h3 id="content-addressable-storage">
+  Content Addressable Storage
+  <a class="heading-link" href="#content-addressable-storage">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
 <p>We looked at what goes into an action but haven&rsquo;t described how the action is presented to the remote-execution server by the client. In the remote-execution API specification, content-addressable storage (CAS) is used to present the action and also the dependencies specified by the action. The CAS is a common key-value store that both the remote-execution client and remote-execution server utilize for exchanging data.
 The general series of steps in presenting an a piece of data (an action spec / an input file etc) to a remote-execution server using content-addressable storage is:</p>
 <ol>
@@ -196,42 +258,48 @@ The general series of steps in presenting an a piece of data (an action spec / a
 <p>Present the digest to the remote-execution server which can in-turn utilize the CAS service to fetch the data.</p>
 </li>
 </ol>
-<h3 id="steps-involved-in-running-an-action">Steps involved in running an action</h3>
+<h3 id="steps-involved-in-running-an-action">
+  Steps involved in running an action
+  <a class="heading-link" href="#steps-involved-in-running-an-action">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
 <p>At this point we have all the basic building blocks we need to see how we can run an action remotely. Lets take a sample C++ compile command we saw above, add more details to it and see how it can be remotely executed with the remote-execution API.</p>
 <p>test.cpp:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">#include &#34;test.h&#34;
-int main() {
-    std::cout &lt;&lt; &#34;Hello world!\n&#34;;
-    return 0;
-}
-</code></pre></div><p>test.h</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">#ifndef TEST_H
-#define TEST_H
-
-#include &lt;iostream&gt;
-
-#endif
-</code></pre></div><ol>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>#include &#34;test.h&#34;
+</span></span><span style="display:flex;"><span>int main() {
+</span></span><span style="display:flex;"><span>    std::cout &lt;&lt; &#34;Hello world!\n&#34;;
+</span></span><span style="display:flex;"><span>    return 0;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>test.h</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="">#ifndef TEST_H
+</span></span></span><span style="display:flex;"><span><span style="">#define TEST_H
+</span></span></span><span style="display:flex;"><span><span style=""></span>
+</span></span><span style="display:flex;"><span><span style="">#include</span> <span style="">&lt;iostream&gt;</span><span style="">
+</span></span></span><span style="display:flex;"><span><span style=""></span>
+</span></span><span style="display:flex;"><span><span style="">#endif
+</span></span></span></code></pre></div><ol>
 <li>Determine the inputs of above action. In Bazel, the dependent header files are described in <code>BUILD</code> file. In scenarios where that is not the case, the test.cpp file will be preprocessed to find out the dependent header files.</li>
 <li>Upload each of the header files along to CAS keyed with their digest.</li>
 <li>Determine the output to be produced by the action. In this case, the output is going to be <code>test.o</code> file.</li>
 <li>Determine the toolchain to be used for this compilation. Lets assume that we are going to use <code>clang-10</code> and assume that the remote-execution server will make it available when remotely running the action.</li>
 <li>Construct the action spec. It would look something like (in textproto):</li>
 </ol>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">input_root_digest: &lt;input-dir-digest&gt;
-output_files: &#34;test.o&#34;
-platform: {
-    key: &#34;toolchain&#34;
-    value: &#34;clang-10&#34;
-}
-platform: {
-    key: &#34;OS&#34;
-    value: &#34;Linux&#34;
-}
-</code></pre></div><ol start="6">
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>input_root_digest: &lt;input-dir-digest&gt;
+</span></span><span style="display:flex;"><span>output_files: <span style="font-style:italic">&#34;test.o&#34;</span>
+</span></span><span style="display:flex;"><span>platform: {
+</span></span><span style="display:flex;"><span>    key: <span style="font-style:italic">&#34;toolchain&#34;</span>
+</span></span><span style="display:flex;"><span>    value: <span style="font-style:italic">&#34;clang-10&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>platform: {
+</span></span><span style="display:flex;"><span>    key: <span style="font-style:italic">&#34;OS&#34;</span>
+</span></span><span style="display:flex;"><span>    value: <span style="font-style:italic">&#34;Linux&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ol start="6">
 <li>Serialize the action spec to binary format and compute the digest of the serialized action spec.</li>
 <li>Upload the action spec to CAS keyed by its digest.</li>
-<li>Call <a href="https://github.com/bazelbuild/remote-apis/blob/master/build/bazel/remote/execution/v2/remote_execution.proto#L107">Execute()</a> RPC on the remote-execution server.</li>
+<li>Call <a href="https://github.com/bazelbuild/remote-apis/blob/master/build/bazel/remote/execution/v2/remote_execution.proto#L107"  class="external-link" target="_blank" rel="noopener">Execute()</a> RPC on the remote-execution server.</li>
 <li>Download the output file from the CAS using the digest present in the result of the <code>Execute()</code> call.</li>
 </ol>
 
@@ -245,60 +313,92 @@ platform: {
         
         
         
+        
+        
+        
+        
       </footer>
     </article>
 
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/startup.js" id="MathJax-script"></script>
-  <script>
-    MathJax = {
-      tex: {
-        inlineMath: [
-          ['$', '$'], ['\\(', '\\)']
-        ],
-        processEscapes: true,
-        processEnvironments: true
-      },
-      options: {
-        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css"
+    integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+  
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"
+    integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"
+    integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+    onload="renderMathInElement(document.body,
+      {
+        delimiters: [
+          {left: '$$', right: '$$', display:true},
+          {left: '$', right: '$', display:false},
+          {left: '\\(', right: '\\)', display: false},
+          {left: '\\[', right: '\\]', display: true}
+        ]
       }
-    };
-  </script>
+    );"></script>
   </section>
 
-      </div>
+    </div>
 
-      
-  <footer class="footer">
-    <section class="container">
-      
-      
-        ©
-        
-        2020
-         Kousik Kumar 
-      
-      
-      
-    </section>
-  </footer>
-
-    </main>
-
+    <footer class="footer">
+  <section class="container">
+    ©
     
-      
-      <script src="https://kousiktn.github.io/js/dark-mode.min.0213e1773e6d1c5a644f847c67a6f8abac49a3776e2976f6008038af8c5b76a1.js"></script>
+    2024
+     Kousik Kumar 
+    ·
     
-
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
     
+  </section>
+</footer>
 
-    
+  </main>
 
-    
+  
 
-    
+  
+  
+  <script src="https://kousiktn.github.io/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
 
-  </body>
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
 
 </html>

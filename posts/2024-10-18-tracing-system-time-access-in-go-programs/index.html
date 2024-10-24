@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  Tracing System Time Access In Go Programs · kousikk
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Kousik Kumar">
+<meta name="description" content="
+  Tracing System Time Access in Go Programs
+  
+    
+    Link to heading
+  
+
+
+  Background
+  
+    
+    Link to heading
+  
+
+We recently had a use case where we wanted to figure out anytime a program tried to access the system time. Given the recent eBPF experiments, I wanted to see if there&rsquo;s a system call to do this, and there is: the gettimeofday syscall, which can give us the current time.">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Tracing System Time Access In Go Programs">
+  <meta name="twitter:description" content="Tracing System Time Access in Go Programs Link to heading Background Link to heading We recently had a use case where we wanted to figure out anytime a program tried to access the system time. Given the recent eBPF experiments, I wanted to see if there’s a system call to do this, and there is: the gettimeofday syscall, which can give us the current time.">
+
+<meta property="og:url" content="https://kousiktn.github.io/posts/2024-10-18-tracing-system-time-access-in-go-programs/">
+  <meta property="og:site_name" content="kousikk">
+  <meta property="og:title" content="Tracing System Time Access In Go Programs">
+  <meta property="og:description" content="Tracing System Time Access in Go Programs Link to heading Background Link to heading We recently had a use case where we wanted to figure out anytime a program tried to access the system time. Given the recent eBPF experiments, I wanted to see if there’s a system call to do this, and there is: the gettimeofday syscall, which can give us the current time.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-10-18T00:00:00+00:00">
+    <meta property="article:modified_time" content="2024-10-18T00:00:00+00:00">
+
+
+
+
+<link rel="canonical" href="https://kousiktn.github.io/posts/2024-10-18-tracing-system-time-access-in-go-programs/">
+
+
+<link rel="preload" href="https://kousiktn.github.io/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://kousiktn.github.io/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://kousiktn.github.io/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="https://kousiktn.github.io/css/coder.min.320f775dc23c4eaba9df40ebced622292869c0437f4d5d744c43e5fe34882f03.css" integrity="sha256-Mg93XcI8Tqup30DrztYiKShpwEN/TV10TEPl/jSILwM=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="https://kousiktn.github.io/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="https://kousiktn.github.io/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="https://kousiktn.github.io/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="https://kousiktn.github.io/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="https://kousiktn.github.io/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://kousiktn.github.io/images/apple-touch-icon.png">
+
+<link rel="manifest" href="https://kousiktn.github.io/site.webmanifest">
+<link rel="mask-icon" href="https://kousiktn.github.io/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+
+
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://kousiktn.github.io/">
+      kousikk
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://kousiktn.github.io/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://kousiktn.github.io/about/">About</a>
+            </li>
+          
+        
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://kousiktn.github.io/posts/2024-10-18-tracing-system-time-access-in-go-programs/">
+              Tracing System Time Access In Go Programs
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2024-10-18T00:00:00Z">
+                October 18, 2024
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          
+          
+        </div>
+      </header>
+
+      <div class="post-content">
+        
+        <h1 id="tracing-system-time-access-in-go-programs">
+  Tracing System Time Access in Go Programs
+  <a class="heading-link" href="#tracing-system-time-access-in-go-programs">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h1>
+<h2 id="background">
+  Background
+  <a class="heading-link" href="#background">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>We recently had a use case where we wanted to figure out anytime a program tried to access the system time. Given the recent eBPF experiments, I wanted to see if there&rsquo;s a system call to do this, and there is: the <a href="https://man7.org/linux/man-pages/man2/gettimeofday.2.html"  class="external-link" target="_blank" rel="noopener"><code>gettimeofday</code></a> syscall, which can give us the current time.</p>
+<p>However, for optimization purposes, it seems like Go programs do not directly make a syscall whenever <code>time.Now()</code> is called. Instead, they use a mechanism called vDSO in Linux, whereby some common Kernel functions can be dynamically linked into the executable through a shared object provided by the Kernel. With this mechanism, the program can directly access the system time without a userspace -&gt; Kernelspace jump for this syscall. Slide 10 in <a href="https://lpc.events/event/18/contributions/1934/attachments/1507/3178/lpc2024-vDSO-bpf.pdf"  class="external-link" target="_blank" rel="noopener">this presentation</a> has good info about the vDSO mechanism. More information about Go&rsquo;s vDSO usage can be found in <a href="https://tpaschalis.me/golang-time-now/"  class="external-link" target="_blank" rel="noopener">this blog post</a>.</p>
+<h2 id="tracing-with-uprobes">
+  Tracing with uprobes
+  <a class="heading-link" href="#tracing-with-uprobes">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p><code>uprobe</code> is an eBPF mechanism that allows us to trace any userspace function. What if we set a <code>uprobe</code> to trace the <code>time.Now()</code> function? That should work, right?</p>
+<p>With <code>uprobes</code>, we can dynamically attach to userspace functions and collect information whenever those functions are called. By attaching a <code>uprobe</code> to <code>time.Now()</code>, we can effectively trace every access to the system time, even if it&rsquo;s optimized using vDSO.</p>
+<p>Ok, let&rsquo;s start by inspecting the functions in a sample Go program that just prints the current time:</p>
+<p>File: <code>main.go</code></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="font-weight:bold">import</span> (
+</span></span><span style="display:flex;"><span>    <span style="font-style:italic">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="font-style:italic">&#34;time&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="font-weight:bold">func</span> main() {
+</span></span><span style="display:flex;"><span>    currentTime := time.Now()
+</span></span><span style="display:flex;"><span>    fmt.Println(currentTime)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This simple program retrieves and prints the current system time using time.Now().</p>
+<p>Build the program using:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ go build main.go
+</span></span></code></pre></div><p>Then run:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ objdump -tT main | grep <span style="font-style:italic">&#34;time.Now&#34;</span>
+</span></span><span style="display:flex;"><span>objdump: main: not a dynamic object
+</span></span><span style="display:flex;"><span>0000000000491120 g     F .text    000000000000006e time.Now
+</span></span></code></pre></div><p>Ok, now that we see the time.Now function, let&rsquo;s write a uprobe using bpftrace. You can learn more about bpftrace and related tools <a href="https://github.com/iovisor/bpftrace"  class="external-link" target="_blank" rel="noopener">here</a>.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ sudo bpftrace -e <span style="font-style:italic">&#39;uprobe:/home/kousikk/time-now/main:&#34;time.Now&#34; { printf(&#34;PID: %d\n&#34;, pid); }&#39;</span>
+</span></span></code></pre></div><p>This trace will print the PID of any execution of the <code>main</code> binary that accesses the time.Now() function. Great!</p>
+<h2 id="performance-penalty-of-tracing">
+  Performance Penalty of Tracing
+  <a class="heading-link" href="#performance-penalty-of-tracing">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>While using uprobes with eBPF is a powerful way to trace system time access, it does come with a performance cost. Attaching uprobes adds overhead because every time the traced function is called, there comes a switch from userspace (time.Now() running through <code>vDSO</code> mechanism) to Kernel space to run the uprobe. In fact, an argument can be made that this defeats the whole purpose of using <code>vDSO</code>!</p>
+<p>Lets write a simple program to analyze how slow performance can get.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>package main
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>import (
+</span></span><span style="display:flex;"><span>	<span style="font-style:italic">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="font-style:italic">&#34;time&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="font-weight:bold">func</span> main() {
+</span></span><span style="display:flex;"><span>	<span style="font-weight:bold">const</span> iterations = 100000
+</span></span><span style="display:flex;"><span>	start := time.Now()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="font-weight:bold">for</span> i := 0; i &lt; iterations; i++ {
+</span></span><span style="display:flex;"><span>		_ = time.Now()
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	duration := time.Since(start)
+</span></span><span style="display:flex;"><span>	fmt.Printf(<span style="font-style:italic">&#34;Time taken for </span><span style="font-weight:bold;font-style:italic">%d</span><span style="font-style:italic"> calls to time.Now(): %v</span><span style="font-weight:bold;font-style:italic">\n</span><span style="font-style:italic">&#34;</span>, iterations, duration)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Running this without any <code>uprobe</code> on <code>time.Now()</code>, we see that it takes ~3.4ms:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>kousiktn@kousiktn:~/projects/ebpf-time-now$ ./main
+</span></span><span style="display:flex;"><span>Time taken for 100000 calls to time.Now(): 3.389458ms
+</span></span></code></pre></div><p>And when we attach a <code>uprobe</code> on <code>time.Now()</code> with a very simple counter like:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>kousiktn@kousiktn:~/projects/ebpf-time-now$ sudo bpftrace -e &#39;uprobe:/home/kousiktn/projects/ebpf-time-now/main:&#34;time.Now&#34; { @++ }&#39;
+</span></span><span style="display:flex;"><span>Attaching 1 probe...
+</span></span></code></pre></div><p>(in another terminal):</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>kousiktn@kousiktn:~/projects/ebpf-time-now$ ./main
+</span></span><span style="display:flex;"><span>Time taken for 100000 calls to time.Now(): 170.72405ms
+</span></span></code></pre></div><p>That&rsquo;s roughly <code>50x</code> slower!! This maybe a pathological example, but goes to show how slow
+uprobe can get if we aren&rsquo;t aware of the performance slowdown it maybe causing.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css"
+    integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+  
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"
+    integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"
+    integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+    onload="renderMathInElement(document.body,
+      {
+        delimiters: [
+          {left: '$$', right: '$$', display:true},
+          {left: '$', right: '$', display:false},
+          {left: '\\(', right: '\\)', display: false},
+          {left: '\\[', right: '\\]', display: true}
+        ]
+      }
+    );"></script>
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+    2024
+     Kousik Kumar 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="https://kousiktn.github.io/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+
+</html>
