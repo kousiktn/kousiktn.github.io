@@ -6,12 +6,12 @@
     <description>Recent content in Posts on kousikk</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 18 Oct 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 13 Dec 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://kousiktn.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>eBPF Forensics</title>
       <link>https://kousiktn.github.io/posts/2024-12-13-ebpf-forensics/</link>
-      <pubDate>Fri, 18 Oct 2024 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 13 Dec 2024 00:00:00 +0000</pubDate>
       <guid>https://kousiktn.github.io/posts/2024-12-13-ebpf-forensics/</guid>
       <description>&lt;h1 id=&#34;ebpf-forensics&#34;&gt;&#xA;  eBPF Forensics&#xA;  &lt;a class=&#34;heading-link&#34; href=&#34;#ebpf-forensics&#34;&gt;&#xA;    &lt;i class=&#34;fa-solid fa-link&#34; aria-hidden=&#34;true&#34; title=&#34;Link to heading&#34;&gt;&lt;/i&gt;&#xA;    &lt;span class=&#34;sr-only&#34;&gt;Link to heading&lt;/span&gt;&#xA;  &lt;/a&gt;&#xA;&lt;/h1&gt;&#xA;&lt;p&gt;I&amp;rsquo;ve been trying to understand the various eBPF programs running on my workstation and what sort of functions / tracepoints they hook on and monitor. For some eBPF agents, I do have access to the source code, but for some others, I don&amp;rsquo;t. So my goal was pretty simple - how can I know what programs are running on my machine and what they monitor?&lt;/p&gt;</description>
     </item>
