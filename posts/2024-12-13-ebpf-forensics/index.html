@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  Tracing System Time Access In Go Programs · kousikk
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Kousik Kumar">
+<meta name="description" content="
+  eBPF Forensics
+  
+    
+    Link to heading
+  
+
+I&rsquo;ve been trying to understand the various eBPF programs running on my workstation and what sort of functions / tracepoints they hook on and monitor. For some eBPF agents, I do have access to the source code, but for some others, I don&rsquo;t. So my goal was pretty simple - how can I know what programs are running on my machine and what they monitor?">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Tracing System Time Access In Go Programs">
+  <meta name="twitter:description" content="eBPF Forensics Link to heading I’ve been trying to understand the various eBPF programs running on my workstation and what sort of functions / tracepoints they hook on and monitor. For some eBPF agents, I do have access to the source code, but for some others, I don’t. So my goal was pretty simple - how can I know what programs are running on my machine and what they monitor?">
+
+<meta property="og:url" content="https://kousiktn.github.io/posts/2024-12-13-ebpf-forensics/">
+  <meta property="og:site_name" content="kousikk">
+  <meta property="og:title" content="Tracing System Time Access In Go Programs">
+  <meta property="og:description" content="eBPF Forensics Link to heading I’ve been trying to understand the various eBPF programs running on my workstation and what sort of functions / tracepoints they hook on and monitor. For some eBPF agents, I do have access to the source code, but for some others, I don’t. So my goal was pretty simple - how can I know what programs are running on my machine and what they monitor?">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-10-18T00:00:00+00:00">
+    <meta property="article:modified_time" content="2024-10-18T00:00:00+00:00">
+
+
+
+
+<link rel="canonical" href="https://kousiktn.github.io/posts/2024-12-13-ebpf-forensics/">
+
+
+<link rel="preload" href="https://kousiktn.github.io/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://kousiktn.github.io/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="https://kousiktn.github.io/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="https://kousiktn.github.io/css/coder.min.320f775dc23c4eaba9df40ebced622292869c0437f4d5d744c43e5fe34882f03.css" integrity="sha256-Mg93XcI8Tqup30DrztYiKShpwEN/TV10TEPl/jSILwM=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+  
+    
+    
+    <link rel="stylesheet" href="https://kousiktn.github.io/css/coder-dark.min.a00e6364bacbc8266ad1cc81230774a1397198f8cfb7bcba29b7d6fcb54ce57f.css" integrity="sha256-oA5jZLrLyCZq0cyBIwd0oTlxmPjPt7y6KbfW/LVM5X8=" crossorigin="anonymous" media="screen" />
+  
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="https://kousiktn.github.io/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="https://kousiktn.github.io/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="https://kousiktn.github.io/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="https://kousiktn.github.io/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://kousiktn.github.io/images/apple-touch-icon.png">
+
+<link rel="manifest" href="https://kousiktn.github.io/site.webmanifest">
+<link rel="mask-icon" href="https://kousiktn.github.io/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+
+
+</head>
+
+
+
+
+
+
+<body class="preload-transitions colorscheme-auto">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://kousiktn.github.io/">
+      kousikk
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://kousiktn.github.io/posts/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="https://kousiktn.github.io/about/">About</a>
+            </li>
+          
+        
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container post">
+    <article>
+      <header>
+        <div class="post-title">
+          <h1 class="title">
+            <a class="title-link" href="https://kousiktn.github.io/posts/2024-12-13-ebpf-forensics/">
+              Tracing System Time Access In Go Programs
+            </a>
+          </h1>
+        </div>
+        <div class="post-meta">
+          <div class="date">
+            <span class="posted-on">
+              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+              <time datetime="2024-10-18T00:00:00Z">
+                October 18, 2024
+              </time>
+            </span>
+            <span class="reading-time">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              3-minute read
+            </span>
+          </div>
+          
+          
+          
+        </div>
+      </header>
+
+      <div class="post-content">
+        
+        <h1 id="ebpf-forensics">
+  eBPF Forensics
+  <a class="heading-link" href="#ebpf-forensics">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h1>
+<p>I&rsquo;ve been trying to understand the various eBPF programs running on my workstation and what sort of functions / tracepoints they hook on and monitor. For some eBPF agents, I do have access to the source code, but for some others, I don&rsquo;t. So my goal was pretty simple - how can I know what programs are running on my machine and what they monitor?</p>
+<h2 id="bpftool">
+  bpftool
+  <a class="heading-link" href="#bpftool">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>Enter <code>bpftool</code>. As aptly mentioned <a href="https://qmonnet.github.io/whirl-offload/2021/09/23/bpftool-features-thread/"  class="external-link" target="_blank" rel="noopener">here</a>, <code>bpftool</code> is the swiss army knife for working with BPF. I have <a href="https://github.com/cilium/tetragon"  class="external-link" target="_blank" rel="noopener">tetragon</a> running on my machine and will try to trace it back to its hook points without look at the source code.</p>
+<p>Lets first list all the BPF programs on the machine.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>$ sudo bpftool prog show
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>9670: kprobe  name event_exit_acct_process  tag bfe8143baf930e43  gpl run_time_ns 1180281 run_cnt 66
+</span></span><span style="display:flex;"><span>        loaded_at 2024-12-16T14:44:30+0000  uid 0
+</span></span><span style="display:flex;"><span>        xlated 6488B  jited 4236B  memlock 8192B  map_ids 14682,14693,14681,14697,14718,14700,14687,14688,14684
+</span></span><span style="display:flex;"><span>        btf_id 9284
+</span></span><span style="display:flex;"><span>        pids tetragon(2996292)
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>(there&rsquo;s more programs listed, but lets just work with <code>event_exit_acct_process</code> for now)</p>
+<p>This is great - it tells me the size of <code>xlated</code> and <code>jited</code> forms of the programs and tells me all the maps the programs use. In addition, the more recent version of <code>bpftool</code> also shows the associated PID (tetragon in this case) that loaded this program - which is awesome.</p>
+<p>But how do I figure out what hook point this program actually monitors? There&rsquo;s another command in bpftool to show just that and associate the BPF program to its link point.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>$ sudo bpftool link show -j | jq <span style="font-style:italic">&#39;.[]&#39;</span>
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;id&#34;</span>: 733,
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;type&#34;</span>: <span style="font-style:italic">&#34;perf_event&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;prog_id&#34;</span>: 9670,
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;retprobe&#34;</span>: false,
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;addr&#34;</span>: 18446744072184711428,
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;func&#34;</span>: <span style="font-style:italic">&#34;acct_process&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;offset&#34;</span>: 0,
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;missed&#34;</span>: 0,
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;cookie&#34;</span>: 0,
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;bpf_cookie&#34;</span>: 0,
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;pids&#34;</span>: [
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="font-style:italic">&#34;pid&#34;</span>: 2996292,
+</span></span><span style="display:flex;"><span>      <span style="font-style:italic">&#34;comm&#34;</span>: <span style="font-style:italic">&#34;tetragon&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  ]
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>...
+</span></span></code></pre></div><p>There we see it - the <code>prog_id: 9670</code> is attached to a function <a href="https://docs.kernel.org/core-api/kernel-api.html#c.acct_process"  class="external-link" target="_blank" rel="noopener">acct_proccess</a> in the Kernel. Neat ok, so it seems like this BPF program is likely monitoring process exits.</p>
+<p>Now, how about a program that&rsquo;s attached to a tracepoint? I&rsquo;m mentioning it because the programs attached to tracepoints don&rsquo;t look so straightforward!</p>
+<p>For example, here&rsquo;s some output from <code>bpftool link show</code> that shows a tracepoint:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>$ sdo bpftool link show -j | jq <span style="font-style:italic">&#39;.[]&#39;</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;id&#34;</span>: 720,
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;type&#34;</span>: <span style="font-style:italic">&#34;tracing&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;prog_id&#34;</span>: 9527,
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;prog_type&#34;</span>: <span style="font-style:italic">&#34;tracing&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;attach_type&#34;</span>: <span style="font-style:italic">&#34;trace_fexit&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;target_obj_id&#34;</span>: 1,
+</span></span><span style="display:flex;"><span>  <span style="font-style:italic">&#34;target_btf_id&#34;</span>: 109991,
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>It has the <code>prog_id</code>, we know its an <code>fexit</code> program type, but we actually don&rsquo;t know which tracepoint it hooks to. The <code>target_btf_id</code> field tells us this, unfortunately, the ID isn&rsquo;t useful much. To convert the BTF ID to the tracepoint, we can:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>$ sudo bpftool btf dump file /sys/kernel/btf/vmlinux | grep <span style="font-style:italic">&#34;109991&#34;</span>
+</span></span><span style="display:flex;"><span>[109991] FUNC <span style="font-style:italic">&#39;tcp_sendmsg&#39;</span> type_id=55011 linkage=<span style="font-weight:bold">static</span>
+</span></span></code></pre></div><p>There we go, the <code>id: 720</code> BPF program is tracing <code>tcp_sendmsg</code>. In general, the <code>bpftool</code> tool is super powerful for inspecting BPF programs on the machine! The commands around <code>bpftool map dump</code> actually lets us see what information is being held by the BPF programs running on our machine.</p>
+
+      </div>
+
+
+      <footer>
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+      </footer>
+    </article>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css"
+    integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+  
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"
+    integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"
+    integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+    onload="renderMathInElement(document.body,
+      {
+        delimiters: [
+          {left: '$$', right: '$$', display:true},
+          {left: '$', right: '$', display:false},
+          {left: '\\(', right: '\\)', display: false},
+          {left: '\\[', right: '\\]', display: true}
+        ]
+      }
+    );"></script>
+  </section>
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+    2024
+     Kousik Kumar 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="https://kousiktn.github.io/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+
+</html>
