@@ -9,18 +9,18 @@
     <lastBuildDate>Fri, 18 Oct 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://kousiktn.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>eBPF Forensics</title>
+      <link>https://kousiktn.github.io/posts/2024-12-13-ebpf-forensics/</link>
+      <pubDate>Fri, 18 Oct 2024 00:00:00 +0000</pubDate>
+      <guid>https://kousiktn.github.io/posts/2024-12-13-ebpf-forensics/</guid>
+      <description>&lt;h1 id=&#34;ebpf-forensics&#34;&gt;&#xA;  eBPF Forensics&#xA;  &lt;a class=&#34;heading-link&#34; href=&#34;#ebpf-forensics&#34;&gt;&#xA;    &lt;i class=&#34;fa-solid fa-link&#34; aria-hidden=&#34;true&#34; title=&#34;Link to heading&#34;&gt;&lt;/i&gt;&#xA;    &lt;span class=&#34;sr-only&#34;&gt;Link to heading&lt;/span&gt;&#xA;  &lt;/a&gt;&#xA;&lt;/h1&gt;&#xA;&lt;p&gt;I&amp;rsquo;ve been trying to understand the various eBPF programs running on my workstation and what sort of functions / tracepoints they hook on and monitor. For some eBPF agents, I do have access to the source code, but for some others, I don&amp;rsquo;t. So my goal was pretty simple - how can I know what programs are running on my machine and what they monitor?&lt;/p&gt;</description>
+    </item>
+    <item>
       <title>Tracing System Time Access In Go Programs</title>
       <link>https://kousiktn.github.io/posts/2024-10-18-tracing-system-time-access-in-go-programs/</link>
       <pubDate>Fri, 18 Oct 2024 00:00:00 +0000</pubDate>
       <guid>https://kousiktn.github.io/posts/2024-10-18-tracing-system-time-access-in-go-programs/</guid>
       <description>&lt;h1 id=&#34;tracing-system-time-access-in-go-programs&#34;&gt;&#xA;  Tracing System Time Access in Go Programs&#xA;  &lt;a class=&#34;heading-link&#34; href=&#34;#tracing-system-time-access-in-go-programs&#34;&gt;&#xA;    &lt;i class=&#34;fa-solid fa-link&#34; aria-hidden=&#34;true&#34; title=&#34;Link to heading&#34;&gt;&lt;/i&gt;&#xA;    &lt;span class=&#34;sr-only&#34;&gt;Link to heading&lt;/span&gt;&#xA;  &lt;/a&gt;&#xA;&lt;/h1&gt;&#xA;&lt;h2 id=&#34;background&#34;&gt;&#xA;  Background&#xA;  &lt;a class=&#34;heading-link&#34; href=&#34;#background&#34;&gt;&#xA;    &lt;i class=&#34;fa-solid fa-link&#34; aria-hidden=&#34;true&#34; title=&#34;Link to heading&#34;&gt;&lt;/i&gt;&#xA;    &lt;span class=&#34;sr-only&#34;&gt;Link to heading&lt;/span&gt;&#xA;  &lt;/a&gt;&#xA;&lt;/h2&gt;&#xA;&lt;p&gt;We recently had a use case where we wanted to figure out anytime a program tried to access the system time. Given the recent eBPF experiments, I wanted to see if there&amp;rsquo;s a system call to do this, and there is: the &lt;a href=&#34;https://man7.org/linux/man-pages/man2/gettimeofday.2.html&#34;  class=&#34;external-link&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;code&gt;gettimeofday&lt;/code&gt;&lt;/a&gt; syscall, which can give us the current time.&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>Tracing System Time Access In Go Programs</title>
-      <link>https://kousiktn.github.io/posts/2024-12-13-ebpf-forensics/</link>
-      <pubDate>Fri, 18 Oct 2024 00:00:00 +0000</pubDate>
-      <guid>https://kousiktn.github.io/posts/2024-12-13-ebpf-forensics/</guid>
-      <description>&lt;h1 id=&#34;ebpf-forensics&#34;&gt;&#xA;  eBPF Forensics&#xA;  &lt;a class=&#34;heading-link&#34; href=&#34;#ebpf-forensics&#34;&gt;&#xA;    &lt;i class=&#34;fa-solid fa-link&#34; aria-hidden=&#34;true&#34; title=&#34;Link to heading&#34;&gt;&lt;/i&gt;&#xA;    &lt;span class=&#34;sr-only&#34;&gt;Link to heading&lt;/span&gt;&#xA;  &lt;/a&gt;&#xA;&lt;/h1&gt;&#xA;&lt;p&gt;I&amp;rsquo;ve been trying to understand the various eBPF programs running on my workstation and what sort of functions / tracepoints they hook on and monitor. For some eBPF agents, I do have access to the source code, but for some others, I don&amp;rsquo;t. So my goal was pretty simple - how can I know what programs are running on my machine and what they monitor?&lt;/p&gt;</description>
     </item>
     <item>
       <title>Remote Build Execution</title>
